@@ -52,7 +52,7 @@ int main() {
     // Load widgets for the preset
     if (!SettingsManager::loadWidgets(generalSettingsPath, lastUsedPreset, widgets)) {
         // std::cerr << "No widgets found for preset '" << lastUsedPreset << "'. Using default widgets.\n";
-        widgets.emplace_back(std::make_unique<CounterWidget>("DefaultCounter", 0.5f, 0.5f, CounterWidget::CounterMode::Seconds, 0));
+        // widgets.emplace_back(std::make_unique<CounterWidget>("DefaultCounter", 0.5f, 0.5f, CounterWidget::CounterMode::Seconds, 0));
     }
     
     // Initialize SDL and FFmpeg
@@ -60,6 +60,9 @@ int main() {
     SDL_Window* window = SDL_CreateWindow("PiWeather", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 600, SDL_WINDOW_FULLSCREEN);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+    // Hide the cursor
+    SDL_ShowCursor(SDL_DISABLE);
+    
     // FFmpeg setup for video playback
     AVFormatContext* formatContext = nullptr;
     const char* videoPath = "/home/pi/Videos/PiWeather/totoro_001.mp4";

@@ -2,6 +2,9 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <vector>
+#include <string>
+
 #include "widgets/counterwidget.h"
 
 bool SettingsManager::loadGeneralSettings(const std::string& filePath, std::string& lastUsedPreset, const std::string& version) {
@@ -69,19 +72,35 @@ bool SettingsManager::loadWidgets(const std::string& filePath, const std::string
         }
 
         if (currentSection == preset) {
-            std::istringstream stream(line);
-            std::string widgetType, name;
-            float xPercentage, yPercentage;
-            int modeInt;
-            long long startTime;
+            std::istringstream keyValueStream(line);
+            std::string key, value;
 
-            if (stream >> widgetType >> name >> xPercentage >> yPercentage >> modeInt >> startTime) {
-                if (widgetType == "CounterWidget") {
-                    widgets.emplace_back(std::make_unique<CounterWidget>(
-                        name, xPercentage, yPercentage, static_cast<CounterWidget::CounterMode>(modeInt), startTime
-                    ));
-                } else {
-                    std::cerr << "Unknown widget type: " << widgetType << std::endl;
+            if (std::getline(keyValueStream, key, '=') && std::getline(keyValueStream, value)) {
+                if (key == "Widget") {
+                    std::istringstream valueStream(value);
+                    std::string widgetType, name;
+                    float xPercentage, yPercentage;
+                    int modeInt;
+                    long long startTime;
+
+                    std::getline(valueStream, widgetType, ',');
+                    std::getline(valueStream, name, ',');
+                    valueStream >> xPercentage;
+                    valueStream.ignore(); // Skip the comma
+                    valueStream >> yPercentage;
+                    valueStream.ignore();
+                    valueStream >> modeInt;
+                    valueStream.ignore();
+                    valueStream >> startTime;
+
+                    if (widgetType == "CounterWidget") {
+                        widgets.emplace_back(std::make_unique<CounterWidget>(
+                            name, xPercentage, yPercentage, static_cast<CounterWidget::CounterMode>(modeInt), startTime
+                        ));
+                        std::cout << "Loaded CounterWidget: " << name << std::endl;
+                    } else {
+                        std::cerr << "Unknown widget type: " << widgetType << std::endl;
+                    }
                 }
             }
         }
